@@ -36,9 +36,8 @@ function createWindow() {
     mainWindow.removeMenu()
   }
 
-  mainWindow.on('close', (e) => {
-    e.preventDefault()
-    mainWindow.hide()
+  mainWindow.on('close', () => {
+    app.quit()
   })
 
   if (isDev) {
@@ -108,5 +107,5 @@ app.on('before-quit', () => {
 })
 
 app.on('window-all-closed', () => {
-  // stay alive in tray
+  app.quit()
 })
