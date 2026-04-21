@@ -5,3 +5,6 @@ out/
 *.db
 release/
 .env
+
+# Claude Code
+.claude/
