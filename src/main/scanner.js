@@ -2,16 +2,37 @@ import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 
-function getAllFiles(dirPath, results = []) {
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true })
-  for (const entry of entries) {
-    const full = path.join(dirPath, entry.name)
-    if (entry.isDirectory()) {
-      getAllFiles(full, results)
-    } else {
-      results.push(full)
+const MAX_FILES = 500_000
+const MAX_DEPTH = 50
+
+// Iterative walk — avoids stack overflow on deep trees (Finding #7)
+// Skips symlinks to prevent directory escape and infinite loops (Finding #5)
+function getAllFiles(startPath) {
+  const queue = [{ dir: startPath, depth: 0 }]
+  const results = []
+
+  while (queue.length > 0 && results.length < MAX_FILES) {
+    const { dir, depth } = queue.shift()
+    if (depth > MAX_DEPTH) continue
+
+    let entries
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true })
+    } catch {
+      continue // permission denied or directory gone — skip silently
+    }
+
+    for (const entry of entries) {
+      if (entry.isSymbolicLink()) continue // never follow symlinks (Finding #5)
+      const full = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        queue.push({ dir: full, depth: depth + 1 })
+      } else {
+        results.push(full)
+      }
     }
   }
+
   return results
 }
 
@@ -25,6 +46,12 @@ function hashFile(filePath) {
   })
 }
 
+// Truncate long paths before sending over IPC (Finding #12)
+export function truncatePath(p, max = 500) {
+  if (!p || p.length <= max) return p
+  return '\u2026' + p.slice(-(max - 1))
+}
+
 export async function scanFolder(folderPath, excludePatterns = [], onProgress) {
   let files
   try {
@@ -33,13 +60,22 @@ export async function scanFolder(folderPath, excludePatterns = [], onProgress) {
     return []
   }
 
-  if (excludePatterns.length > 0) {
-    files = files.filter((f) => !excludePatterns.some((p) => f.includes(p)))
+  // Only apply patterns that are valid strings of useful length (Finding #8)
+  const validPatterns = (excludePatterns || []).filter(
+    (p) => typeof p === 'string' && p.length >= 2
+  )
+
+  if (validPatterns.length > 0) {
+    files = files.filter((f) => !validPatterns.some((p) => f.includes(p)))
   }
 
   const results = []
   for (let i = 0; i < files.length; i++) {
-    onProgress?.({ current: i + 1, total: files.length, file: files[i] })
+    onProgress?.({
+      current: i + 1,
+      total: files.length,
+      file: truncatePath(files[i]), // Finding #12
+    })
     try {
       const hash = await hashFile(files[i])
       const { size } = fs.statSync(files[i])
