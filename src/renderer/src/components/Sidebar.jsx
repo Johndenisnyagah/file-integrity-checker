@@ -88,8 +88,7 @@ export default function Sidebar({ currentView, onNavigate }) {
       <div className="sidebar-brand">
         <FolderLogo />
         <div className="sidebar-brand-text">
-          <span className="sidebar-brand-name">File Integrity</span>
-          <span className="sidebar-brand-sub">Checker</span>
+          <span className="sidebar-brand-name">FileGuard</span>
         </div>
       </div>
 

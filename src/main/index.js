@@ -57,14 +57,14 @@ function createTray() {
     { type: 'separator' },
     { label: 'Quit', click: () => { app.quit() } }
   ])
-  tray.setToolTip('File Integrity Checker')
+  tray.setToolTip('FileGuard')
   tray.setContextMenu(contextMenu)
   tray.on('click', () => mainWindow.show())
 }
 
 export function notifyChanges(folderPath, changeCount) {
   new Notification({
-    title: 'File Integrity Alert',
+    title: 'FileGuard Alert',
     body: `${changeCount} change${changeCount > 1 ? 's' : ''} detected in ${folderPath}`,
     icon: path.join(__dirname, '../../assets/icon.png')
   }).show()

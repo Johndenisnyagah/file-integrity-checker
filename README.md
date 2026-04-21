@@ -1,4 +1,4 @@
-# File Integrity Checker
+# FileGuard
 
 A Windows desktop application that monitors folders for unauthorised file changes using SHA-256 hashing. Built as a portfolio project to demonstrate full-stack Electron development with a focus on security tooling.
 

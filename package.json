@@ -1,7 +1,7 @@
 {
-  "name": "file-integrity-checker",
+  "name": "fileguard",
   "version": "1.0.0",
-  "description": "File Integrity Checker - Windows Desktop Security Tool",
+  "description": "FileGuard - Windows Desktop Security Tool",
   "author": "John Denis Nyagah",
   "main": "./out/main/index.js",
   "scripts": {
