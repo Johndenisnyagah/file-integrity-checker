@@ -1,0 +1,41 @@
+appId: com.yourname.fileintegritychecker
+productName: File Integrity Checker
+copyright: Copyright © 2024
+
+directories:
+  buildResources: assets
+  output: release
+
+icon: assets/icon.png
+
+win:
+  target:
+    - target: nsis
+      arch: x64
+  icon: assets/icon.ico
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+files:
+  - out/**
+  - "!out/**/*.map"
+  - node_modules/**
+  - "!node_modules/electron{,-*}/**"
+  - "!node_modules/electron-builder{,-*}/**"
+  - "!node_modules/electron-vite/**"
+  - "!node_modules/electron-rebuild/**"
+  - "!node_modules/vite{,-*}/**"
+  - "!node_modules/@vitejs/**"
+  - "!node_modules/.cache/**"
+  - "!node_modules/**/{test,tests,__tests__,example,examples,benchmark,benchmarks}/**"
+  - "!node_modules/**/*.{md,map,ts}"
+  - package.json
+
+npmRebuild: false
+
+asarUnpack:
+  - node_modules/better-sqlite3/**
