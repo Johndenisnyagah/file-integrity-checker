@@ -2,13 +2,13 @@
   "name": "file-integrity-checker",
   "version": "1.0.0",
   "description": "File Integrity Checker - Windows Desktop Security Tool",
-  "author": "John D",
+  "author": "John Denis Nyagah",
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "package": "npm run build && electron-builder",
-    "test": "npm rebuild better-sqlite3 && vitest run && node node_modules/@electron/rebuild/lib/cli.js -v 41.2.1 -m node_modules/better-sqlite3",
+    "test": "npm rebuild better-sqlite3 && vitest run && node -e \"require('fs').rmSync('node_modules/better-sqlite3/build/Release/.forge-meta',{force:true})\" && node node_modules/@electron/rebuild/lib/cli.js -v 41.2.1 -m node_modules/better-sqlite3 --force",
     "test:watch": "npm rebuild better-sqlite3 && vitest",
     "postinstall": "node scripts/postinstall.js"
   },

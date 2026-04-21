@@ -89,13 +89,61 @@ body {
 }
 
 .sidebar {
-  width: 220px;
+  width: 228px;
   flex-shrink: 0;
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border-default);
+  background: #131313;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
-  padding: var(--space-6) var(--space-4);
+  padding: 28px 16px 24px;
+  gap: 0;
+}
+
+/* Brand area */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding: 0 4px;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1;
+}
+
+.sidebar-brand-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f0f0f0;
+  letter-spacing: -0.01em;
+}
+
+.sidebar-brand-sub {
+  font-size: 11px;
+  color: #555;
+  letter-spacing: 0.02em;
+}
+
+/* Section label */
+.sidebar-section-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #3a3a3a;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+
+/* Nav list */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .main-content {
@@ -176,26 +224,50 @@ body {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  font-size: var(--text-sm);
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  color: #555;
+  font-size: 13.5px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.12s ease;
-  border-left: 2px solid transparent;
+  transition: background 0.12s ease, color 0.12s ease;
   user-select: none;
+  letter-spacing: -0.01em;
+}
+
+.nav-item .nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  transition: background 0.12s ease, color 0.12s ease;
+  flex-shrink: 0;
+}
+
+.nav-item .nav-label {
+  flex: 1;
 }
 
 .nav-item:hover {
-  color: var(--text-primary);
-  background: var(--bg-elevated);
+  color: #c0c0c0;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.nav-item:hover .nav-icon {
+  color: #c0c0c0;
 }
 
 .nav-item.active {
-  color: var(--text-primary);
-  background: var(--bg-elevated);
-  border-left-color: var(--status-ok);
+  color: #f0f0f0;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.nav-item.active .nav-icon {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f0f0f0;
 }
 
 /* Buttons */
