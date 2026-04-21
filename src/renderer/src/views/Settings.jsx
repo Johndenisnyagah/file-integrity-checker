@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { X, Plus } from 'lucide-react'
 
-export default function Settings() {
+export default function Settings({ theme, onThemeChange }) {
   const [patterns, setPatterns] = useState([])
   const [input, setInput] = useState('')
   const [saved, setSaved] = useState(false)
@@ -51,6 +51,34 @@ export default function Settings() {
         )}
       </div>
 
+      {/* ── Appearance ── */}
+      <div className="card" style={{ marginBottom: 'var(--space-4)' }}>
+        <p style={{ fontWeight: 500, fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
+          Appearance
+        </p>
+        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 'var(--space-4)' }}>
+          Choose your preferred colour scheme.
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Theme</span>
+          <div className="theme-toggle">
+            <button
+              className={`theme-toggle-btn${theme === 'dark' ? ' active' : ''}`}
+              onClick={() => onThemeChange('dark')}
+            >
+              Dark
+            </button>
+            <button
+              className={`theme-toggle-btn${theme === 'light' ? ' active' : ''}`}
+              onClick={() => onThemeChange('light')}
+            >
+              Light
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Exclude patterns ── */}
       <div className="card">
         <p style={{ fontWeight: 500, fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
           Exclude patterns

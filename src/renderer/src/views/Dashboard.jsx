@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { FolderOpen, Plus, Trash2, ScanLine, RefreshCw, Eye, EyeOff } from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { FolderOpen, Plus, Trash2, ScanLine, RefreshCw, Eye, EyeOff, ChevronDown } from 'lucide-react'
 import EmptyState from '../components/EmptyState'
 import ProgressBar from '../components/ProgressBar'
 import { useFolders } from '../hooks/useFolders'
@@ -154,6 +154,108 @@ export default function Dashboard({ onNavigate }) {
   )
 }
 
+const SCHEDULE_OPTIONS = [
+  { value: 'manual',  label: 'Manual'  },
+  { value: 'hourly',  label: 'Hourly'  },
+  { value: 'daily',   label: 'Daily'   },
+  { value: 'weekly',  label: 'Weekly'  },
+]
+
+function ScheduleSelect({ value, onChange, disabled }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  }, [open])
+
+  const current = SCHEDULE_OPTIONS.find((o) => o.value === value) ?? SCHEDULE_OPTIONS[0]
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        onClick={() => { if (!disabled) setOpen((o) => !o) }}
+        disabled={disabled}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '6px 10px',
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-default)',
+          borderRadius: 'var(--radius-md)',
+          color: 'var(--text-secondary)',
+          fontSize: 'var(--text-xs)',
+          fontWeight: 500,
+          fontFamily: 'var(--font-sans)',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.5 : 1,
+          whiteSpace: 'nowrap',
+          transition: 'border-color 0.12s ease, color 0.12s ease',
+          minWidth: '78px',
+          justifyContent: 'space-between',
+        }}
+        onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.borderColor = 'var(--border-strong)' }}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-default)' }}
+      >
+        {current.label}
+        <ChevronDown
+          size={11}
+          style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease', opacity: 0.6 }}
+        />
+      </button>
+
+      {open && (
+        <div style={{
+          position: 'absolute',
+          top: 'calc(100% + 5px)',
+          left: 0,
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-strong)',
+          borderRadius: 'var(--radius-md)',
+          padding: '4px',
+          zIndex: 200,
+          minWidth: '100%',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+        }}>
+          {SCHEDULE_OPTIONS.map((opt) => (
+            <div
+              key={opt.value}
+              onClick={() => { onChange(opt.value); setOpen(false) }}
+              style={{
+                padding: '7px 10px',
+                borderRadius: '6px',
+                fontSize: 'var(--text-xs)',
+                fontWeight: 500,
+                fontFamily: 'var(--font-sans)',
+                cursor: 'pointer',
+                color: opt.value === value ? 'var(--text-primary)' : 'var(--text-secondary)',
+                background: opt.value === value ? 'var(--bg-elevated)' : 'transparent',
+                transition: 'background 0.1s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-elevated)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = opt.value === value ? 'var(--bg-elevated)' : 'transparent' }}
+            >
+              {opt.value === value && (
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--status-ok)', flexShrink: 0 }} />
+              )}
+              <span style={{ marginLeft: opt.value === value ? 0 : '13px' }}>{opt.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function FolderCard({ folder, scanning, disabled, isWatching, lastWatchEvent, onScan, onRebaseline, onRemove, onToggleWatch, onNavigate, onScheduleChange }) {
   const baselineDate = folder.baseline_at
     ? new Date(folder.baseline_at + 'Z').toLocaleString()
@@ -177,26 +279,7 @@ function FolderCard({ folder, scanning, disabled, isWatching, lastWatchEvent, on
           </p>
         </div>
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0, alignItems: 'center' }}>
-          <select
-            value={schedule}
-            onChange={(e) => onScheduleChange(e.target.value)}
-            disabled={disabled}
-            style={{
-              background: 'var(--bg-elevated)',
-              color: 'var(--text-secondary)',
-              border: '1px solid var(--border-default)',
-              borderRadius: 'var(--radius-md)',
-              padding: '6px 10px',
-              fontSize: 'var(--text-xs)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-sans)',
-            }}
-          >
-            <option value="manual">Manual</option>
-            <option value="hourly">Hourly</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-          </select>
+          <ScheduleSelect value={schedule} onChange={onScheduleChange} disabled={disabled} />
           <button className="btn-primary" onClick={onScan} disabled={disabled}>
             <ScanLine size={14} />
             {scanning ? 'Scanning…' : 'Scan'}
