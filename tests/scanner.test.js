@@ -17,6 +17,23 @@ function writeFile(dir, name, content = 'hello') {
   return full
 }
 
+/**
+ * Robustly remove a temp directory on Windows CI.
+ * Windows Defender / antivirus can hold file handles briefly after a scan,
+ * causing rmdir to fail with ENOTEMPTY even when the dir looks empty.
+ * We retry with exponential back-off to let the OS release the handles.
+ */
+async function removeDir(dirPath) {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      fs.rmSync(dirPath, { recursive: true, force: true })
+      return
+    } catch {
+      await new Promise((r) => setTimeout(r, 100 * (attempt + 1)))
+    }
+  }
+}
+
 function sha256(content) {
   return crypto.createHash('sha256').update(content).digest('hex')
 }
@@ -51,7 +68,7 @@ describe('scanFolder', () => {
   let tmpDir
 
   beforeEach(() => { tmpDir = makeTmp() })
-  afterEach(() => { fs.rmSync(tmpDir, { recursive: true, force: true }) })
+  afterEach(async () => { await removeDir(tmpDir) })
 
   it('returns an empty array for an empty directory', async () => {
     const results = await scanFolder(tmpDir)
@@ -146,7 +163,7 @@ describe('scanFolder', () => {
       fs.symlinkSync(linkDir, linkPath, 'junction')
     } catch {
       // Skip test if symlink creation is not permitted (non-admin Windows)
-      fs.rmSync(linkDir, { recursive: true, force: true })
+      await removeDir(linkDir)
       return
     }
 
@@ -157,7 +174,7 @@ describe('scanFolder', () => {
     expect(paths.some((p) => p.includes('secret.txt'))).toBe(false)
     expect(paths.some((p) => p.includes('real.txt'))).toBe(true)
 
-    fs.rmSync(linkDir, { recursive: true, force: true })
+    await removeDir(linkDir)
   })
 
   it('handles deeply nested directories without stack overflow', async () => {
